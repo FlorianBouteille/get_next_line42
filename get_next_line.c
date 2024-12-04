@@ -6,7 +6,7 @@
 /*   By: fbouteil <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 12:53:54 by fbouteil          #+#    #+#             */
-/*   Updated: 2024/12/03 16:50:59 by fbouteil         ###   ########.fr       */
+/*   Updated: 2024/12/04 16:33:06 by fbouteil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,19 @@ char	*ft_strjoin(char *s1, char *s2)
 		return (NULL);
 	i = 0;
 	j = 0;
-	while (s1[i])
+	while (s1 && s1[i])
 	{
 		result[i] = s1[i];
 		i++;
 	}
-	while (s2[j])
+	while (s2 && s2[j])
 	{
 		result[i + j] = s2[j];
 		j++;
 	}
+	if (s1)
+		free(s1);
 	result[size] = 0;
-	free(s1);
-	free(s2);
 	return (result);
 }
 
@@ -92,6 +92,8 @@ char	*clean_temp(char *str)
 		i++;
 	}
 	result[len] = 0;
+	if (str)
+		free(str);
 	return (result);
 }
 
@@ -104,18 +106,20 @@ char	*get_next_line(int fd)
 	
 	if (!temp)
 		temp = ft_strdup("");
-	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!buffer)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	while (!check_line(temp))
 	{
+		buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+		if (!buffer)
+			return (NULL);
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read <= 0)
-			return (NULL);
+			break ;
 		buffer[bytes_read] = 0;
 		temp = ft_strjoin(temp, buffer);
+		free(buffer);
 	}
-	free(buffer);
 	line = get_line(temp);
 	temp = clean_temp(temp);
 	return (line);
